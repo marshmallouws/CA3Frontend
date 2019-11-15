@@ -13,9 +13,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [roles, setRoles] = useState([]);
 
-
-
-
   return (
     <Router>
       <Navbar />
@@ -29,6 +26,7 @@ function App() {
         <Route path="/user">
           <LoggedIn roles={roles}/>
         </Route>
+        <PrivateRoute path="/protected" component={Protected}/>
       </Switch>
     </Router>
   );
@@ -56,6 +54,20 @@ function Home() {
     </div>
   )
 }
+
+function Protected() {
+  return (
+    <div>
+      <h1>PROTECTED</h1>
+    </div>
+  )
+}
+
+const PrivateRoute = ({component: Component, ...rest}) => (
+  <Route {...rest} render={(props) => (
+    facade.getToken != null ? <Component {...props} /> : <Redirect to='/login'/> 
+  )} />
+)
 
 function LogIn(props) {
   const [err, setErr] = useState("");

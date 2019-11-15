@@ -17,6 +17,7 @@ class ApiFacade {
 
     loggedIn = () => {
         const loggedIn = this.getToken() != null;
+        console.log(loggedIn);
         return loggedIn;
     }
 
