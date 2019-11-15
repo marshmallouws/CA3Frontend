@@ -7,13 +7,11 @@ import {
   NavLink,
   Redirect
 } from "react-router-dom";
+import { isUserWhitespacable } from "@babel/types";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const setLoggedIn = (state) => {
-    setIsLoggedIn(state);
-  }
+  const [roles, setRoles] = useState([]);
 
   return(
     <Router>
@@ -23,11 +21,11 @@ function App() {
           <Home/>
         </Route>
         <Route path="/login">
-          <LogIn setIsLoggedIn={setIsLoggedIn}/>
+          <LogIn setRoles={setRoles} setIsLoggedIn={setIsLoggedIn}/>
         </Route>
-        <PrivateRoute path="/test">
-          <Test/>
-        </PrivateRoute>
+        <Route path="/user" >
+          <LoggedIn roles={roles} />
+        </Route>
       </Switch>
     </Router>
   );
@@ -48,77 +46,23 @@ function Navbar() {
   );
 }
 
-const PrivateRoute = ({component: Component, ...rest}) => {
-  return (
-    <Route
-      {...rest}
-      render={(props) => fakeAuth.isAuthenticated === true
-        ? <Component {...props} />
-        : <Redirect to={{pathname: '/login', state: {from: props.location}}} />} />
-  )
-}
-
-function Test() {
-  return(
-    <div>Private!</div>
-  )
-}
-
 function Home() {
-  return(
-    <div>Home</div>
-  );
-}
-
-/*
-function Login(props) {
-  //const [loggedIn, setLoggedIn] = useState(false);
-  const [roles, setRoles] = useState([]);
-  const [err, setErr] = useState("");
-
-  const logout = () => {
-    facade.logout();
-    setLoggedIn(false);
-  }
-
-  const setErrorMsg = (msg) => {
-    setErr(msg);
-  }
-
-  const login = (user, pass) => {
-    facade.login(user, pass)
-      .then(data => {setRoles(data.roles); props.setIsLoggedIn(true)})
-      .catch(err => {
-        setErrorMsg("Wrong username or password");
-      });
-  }
-
   return (
-    <div> 
-      {!loggedIn ? (<div><LogIn login={login} setErrorMsg={setErrorMsg} /><p>{err}</p></div>) :
-        (<div>
-          <LoggedIn roles={roles} />
-          <button onClick={logout}>Logout</button>
-        </div>)}
+    <div>
+      <h1>Homepage</h1>
     </div>
   )
-}  */
+}
 
 function LogIn(props) {
+  const [err, setErr] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
-  const [roles, setRoles] = useState([]);
-  /*
-  const login = (event) => {
-    event.preventDefault();
-    props.login(username, password);
-  } */
 
   const login = (event) => {
     event.preventDefault();
     facade.login(username, password)
-      .then(data => {setRoles(data.roles); props.setIsLoggedIn(true)})
+      .then(data => {props.setRoles(data.roles); props.setIsLoggedIn(true); console.log(data.roles);})
       .catch(err => {
         setErr("Wrong username or password");
     });
@@ -152,15 +96,15 @@ function LogIn(props) {
 }
 
 function LoggedIn(props) {
-  const {roles} = props;
   const [dataFromServer, setDataFromServer] = useState("Fetching!!");
+  console.log(props);
   return (
     <div>
       <h2>Data recieved</h2>
       <h3>{dataFromServer}</h3>
       <h4>Roles</h4>
         {
-          roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
+          //roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
         }
     </div>
   )
