@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import facade from "./apifacade";
 import {
   BrowserRouter as Router,
@@ -13,18 +13,21 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [roles, setRoles] = useState([]);
 
-  return(
+
+
+
+  return (
     <Router>
-    <Navbar/>
+      <Navbar />
       <Switch>
         <Route exact path="/">
-          <Home/>
+          <Home />
         </Route>
         <Route path="/login">
-          <LogIn setRoles={setRoles} setIsLoggedIn={setIsLoggedIn}/>
+          <LogIn setRoles={setRoles} setIsLoggedIn={setIsLoggedIn} />
         </Route>
-        <Route path="/user" >
-          <LoggedIn roles={roles} />
+        <Route path="/user">
+          <LoggedIn roles={roles}/>
         </Route>
       </Switch>
     </Router>
@@ -32,7 +35,7 @@ function App() {
 }
 
 function Navbar() {
-  return(
+  return (
     <nav className="header">
       <ul>
         <li>
@@ -58,14 +61,15 @@ function LogIn(props) {
   const [err, setErr] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [redirect, setRedirect] = useState(false);
 
   const login = (event) => {
     event.preventDefault();
     facade.login(username, password)
-      .then(data => {props.setRoles(data.roles); props.setIsLoggedIn(true); console.log(data.roles);})
+      .then(data => { props.setRoles(data.roles); props.setIsLoggedIn(true); setRedirect(true);})
       .catch(err => {
         setErr("Wrong username or password");
-    });
+      })
   }
 
   const onChange = (event) => {
@@ -77,19 +81,21 @@ function LogIn(props) {
     }
   }
 
+  if (redirect) return <Redirect to="/user" />;
+
   return (
 
     <div className="container container-small">
-    <div className="wrapper">
-    <h2>Login</h2><br/>
-      <form className="form-signin" onSubmit={login} onChange={onChange} >
-        <div className="form form-group">
-        <input className="form-control" placeholder="User Name" id="username" />
-        </div><div className="form-group">
-        <input className="form-control" placeholder="Password" id="password" /> <br/>
-        <button className="btn btn-primary">Login</button>
-        </div>
-      </form>
+      <div className="wrapper">
+        <h2>Login</h2><br />
+        <form className="form-signin" onSubmit={login} onChange={onChange} >
+          <div className="form form-group">
+            <input className="form-control" placeholder="User Name" id="username" />
+          </div><div className="form-group">
+            <input className="form-control" placeholder="Password" id="password" /> <br />
+            <button className="btn btn-primary">Login</button>
+          </div>
+        </form>
       </div>
     </div>
   )
@@ -97,15 +103,15 @@ function LogIn(props) {
 
 function LoggedIn(props) {
   const [dataFromServer, setDataFromServer] = useState("Fetching!!");
-  console.log(props);
+  const { roles } = props;
   return (
     <div>
       <h2>Data recieved</h2>
       <h3>{dataFromServer}</h3>
       <h4>Roles</h4>
-        {
-          //roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
-        }
+      {
+        roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
+      }
     </div>
   )
 }
