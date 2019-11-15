@@ -103,7 +103,11 @@ function LogIn(props) {
 
 function LoggedIn(props) {
   const [dataFromServer, setDataFromServer] = useState("Fetching!!");
+  const [loggedIn, setLoggedIn] = useState(true);
   const { roles } = props;
+
+  if (!loggedIn) return <Redirect to='/'/>
+
   return (
     <div>
       <h2>Data recieved</h2>
@@ -112,6 +116,8 @@ function LoggedIn(props) {
       {
         roles.map((elem, index) => (<h5 key={index}>{elem}</h5>))
       }
+
+      <button onClick= {() => {facade.logout(); setLoggedIn(false);}}>Log out</button>
     </div>
   )
 }
